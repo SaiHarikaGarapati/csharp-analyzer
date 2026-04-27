@@ -1,0 +1,57 @@
+# Complexity and Maintainability Rules
+# Rules for detecting complex and hard-to-maintain code
+
+rules:
+  - id: high-complexity
+    name: "High Cyclomatic Complexity"
+    type: metric
+    severity: warning
+    description: "Method has high cyclomatic complexity (too many paths)"
+    enabled: true
+    config:
+      threshold: 10  # CC threshold
+
+  - id: high-cognitive-complexity
+    name: "High Cognitive Complexity"
+    type: metric
+    severity: warning
+    description: "Method is difficult to understand"
+    enabled: true
+    config:
+      threshold: 15  # Cognitive complexity threshold
+
+  - id: deep-nesting
+    name: "Deep Nesting"
+    type: metric
+    severity: warning
+    description: "Code has excessive nesting levels"
+    enabled: true
+    config:
+      threshold: 4  # Nesting depth
+
+  - id: long-method
+    name: "Long Method"
+    type: metric
+    severity: warning
+    description: "Method is too long and should be refactored"
+    enabled: true
+    config:
+      threshold: 50  # LOC threshold
+
+  - id: large-method-parameter
+    name: "Too Many Parameters"
+    type: metric
+    severity: warning
+    description: "Method has too many parameters"
+    enabled: true
+    config:
+      threshold: 5  # Parameter count threshold
+
+  - id: deeply-nested-class
+    name: "Deeply Nested Class"
+    type: pattern
+    severity: info
+    description: "Class is nested too deeply"
+    enabled: false
+    config:
+      threshold: 2  # Nesting depth

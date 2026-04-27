@@ -1,0 +1,65 @@
+# Anti-patterns Detection Rules
+# Detects common C# anti-patterns and code smells
+
+rules:
+  - id: god-class
+    name: "God Class"
+    type: metric
+    severity: error
+    description: "Class is doing too many things (too large)"
+    enabled: true
+    config:
+      threshold: 300  # LOC threshold
+
+  - id: feature-envy
+    name: "Feature Envy"
+    type: semantic
+    severity: warning
+    description: "Method uses more features from another class than its own"
+    enabled: true
+    config:
+      threshold: 0.7  # Ratio threshold
+
+  - id: long-parameter-list
+    name: "Long Parameter List"
+    type: metric
+    severity: warning
+    description: "Method has too many parameters"
+    enabled: true
+    config:
+      threshold: 5  # Parameter count
+
+  - id: duplicated-code
+    name: "Duplicated Code"
+    type: pattern
+    severity: warning
+    description: "Code duplication detected"
+    enabled: true
+    config:
+      threshold: 3  # Minimum duplicate lines
+
+  - id: lazy-class
+    name: "Lazy Class"
+    type: metric
+    severity: info
+    description: "Class is doing too little"
+    enabled: false
+    config:
+      threshold: 20  # LOC threshold
+
+  - id: data-class
+    name: "Data Class"
+    type: pattern
+    severity: info
+    description: "Class with only data fields and getters/setters"
+    enabled: false
+    config: {}
+
+  - id: switch-statement-smell
+    name: "Switch Statement Code Smell"
+    type: pattern
+    severity: warning
+    description: "Complex switch statement should use polymorphism"
+    enabled: true
+    config:
+      threshold: 5  # Case count

@@ -1,0 +1,61 @@
+# Code Quality Rules
+# Rules for detecting quality issues and potential bugs
+
+rules:
+  - id: empty-catch-block
+    name: "Empty Catch Block"
+    type: pattern
+    severity: error
+    description: "Catch block has no exception handling logic"
+    enabled: true
+    config: {}
+
+  - id: magic-numbers
+    name: "Magic Numbers"
+    type: pattern
+    severity: warning
+    description: "Hard-coded magic numbers should be named constants"
+    enabled: true
+    config:
+      ignore: [0, 1, 2, -1]  # Common numbers to ignore
+
+  - id: empty-finally-block
+    name: "Empty Finally Block"
+    type: pattern
+    severity: warning
+    description: "Finally block with no code"
+    enabled: true
+    config: {}
+
+  - id: commented-code
+    name: "Commented Out Code"
+    type: pattern
+    severity: info
+    description: "Dead code that should be removed"
+    enabled: false
+    config: {}
+
+  - id: long-variable-name
+    name: "Overly Long Variable Name"
+    type: pattern
+    severity: info
+    description: "Variable name is too long and unclear"
+    enabled: false
+    config:
+      threshold: 30  # Character count
+
+  - id: unclear-variable-name
+    name: "Unclear Variable Name"
+    type: pattern
+    severity: warning
+    description: "Variable name doesn't clearly indicate purpose"
+    enabled: false
+    config: {}
+
+  - id: missing-documentation
+    name: "Missing XML Documentation"
+    type: pattern
+    severity: info
+    description: "Public method/class missing XML documentation"
+    enabled: false
+    config: {}

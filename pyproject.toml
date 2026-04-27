@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "csharp-analyzer"
+version = "0.1.0"
+description = "Python-based C# codebase analyzer for detecting anti-patterns, complexity, and duplication"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Developer", email = "dev@example.com"}
+]
+
+dependencies = [
+    "pydantic>=2.0",
+    "pyyaml>=6.0",
+    "gitpython>=3.1",
+    "click>=8.1",
+    "tabulate>=0.9",
+]
+
+[project.optional-dependencies]
+ai = [
+    "openai>=1.0",
+    "langchain>=0.1",
+]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "flake8>=6.0",
+]
+
+[project.scripts]
+csharp-analyzer = "csharp_analyzer.cli:main"
+
+[tool.setuptools]
+packages = ["csharp_analyzer"]
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.black]
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
