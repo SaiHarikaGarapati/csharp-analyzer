@@ -9,7 +9,9 @@ rules:
     description: "Method has high cyclomatic complexity (too many paths)"
     enabled: true
     config:
-      threshold: 10  # CC threshold
+      threshold: 10  # CC threshold cyclomatic complexity threshold -a software metric used to
+      # measure the structural complexity of a program by calculating the number of linearly independent paths 
+      #through its source code.
 
   - id: high-cognitive-complexity
     name: "High Cognitive Complexity"

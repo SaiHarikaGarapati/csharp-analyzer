@@ -9,7 +9,7 @@ rules:
     description: "Class is doing too many things (too large)"
     enabled: true
     config:
-      threshold: 300  # LOC threshold
+      threshold: 300  # LOC threshold #maxmimum limit of lines of code is 300
 
   - id: feature-envy
     name: "Feature Envy"
