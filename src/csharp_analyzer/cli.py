@@ -35,7 +35,7 @@ def find_csharp_files(directory: Path) -> list:
     return list(directory.rglob("*.cs"))
 
 
-@click.group()
+@click.group() #defines group of commands, creates main CLI entry point, Used on the cli() function
 @click.version_option(version="0.1.0")
 def cli():
     """
@@ -46,23 +46,23 @@ def cli():
     pass
 
 
-@cli.command()
-@click.argument('path', type=click.Path(exists=True))
+@cli.command() #Registers a function as a CLI command, used on analyze(), inspect() and init()
+@click.argument('path', type=click.Path(exists=True)) #this argument decorator defines the required positional argument, path - validates file/directory path
 @click.option(
     '--output',
-    type=click.Path(),
-    help='Output file for report (supports .json, .csv, .html)'
-)
+    type=click.Path(), #type is basically parameter. It's purpose is data type validation
+    help='Output file for report (supports .json, .csv, .html)' #help text shown to users
+) #defines an optional flag or parameter, users can choose to provide it or not
 @click.option(
     '--format',
-    type=click.Choice(['summary', 'detailed', 'table', 'json', 'csv', 'html']),
-    default='table',
+    type=click.Choice(['summary', 'detailed', 'table', 'json', 'csv', 'html']), #choice - restricts input to specific options
+    default='table', #default value 
     help='Output format for console display'
 )
 @click.option(
     '--rules-dir',
     type=click.Path(exists=True),
-    help='Directory containing rule definitions'
+    help='Directory containing rule definitions' /*Load custom rule definitions*/
 )
 @click.option(
     '--max-issues',
@@ -73,7 +73,7 @@ def cli():
 @click.option(
     '--severity',
     type=click.Choice(['error', 'warning', 'info', 'suggestion']),
-    multiple=True,
+    multiple=True, #allow multiple values
     help='Filter findings by severity (can specify multiple)'
 )
 def analyze(
@@ -107,7 +107,7 @@ def analyze(
         csharp_files = find_csharp_files(target_path)
     
     if not csharp_files:
-        click.echo(click.style("❌ No C# files found", fg='red'))
+        click.echo(click.style("❌ No C# files found", fg='red')) # echo-prints text to the console, style-formats text with colors, echo and style should be used together
         sys.exit(1)
     
     click.echo(click.style(f"📁 Found {len(csharp_files)} C# files", fg='cyan'))
@@ -117,7 +117,7 @@ def analyze(
     engine = RulesEngine(rules_directory if Path(rules_directory).exists() else None)
     reporter = Reporter()
     
-    # Analyze each file
+    # Analyze each file - progressbar - shows a progress bar while iterating through items
     with click.progressbar(
         csharp_files,
         label="Analyzing files",
@@ -182,7 +182,7 @@ def analyze(
 @click.argument('file', type=click.Path(exists=True))
 @click.option(
     '--metrics',
-    is_flag=True,
+    is_flag=True, #boolean flag
     help='Show detailed metrics'
 )
 def inspect(file: str, metrics: bool):
