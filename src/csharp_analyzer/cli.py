@@ -62,7 +62,7 @@ def cli():
 @click.option(
     '--rules-dir',
     type=click.Path(exists=True),
-    help='Directory containing rule definitions' /*Load custom rule definitions*/
+    help='Directory containing rule definitions' #Load custom rule definitions
 )
 @click.option(
     '--max-issues',
