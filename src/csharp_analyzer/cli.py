@@ -20,6 +20,7 @@ from .parser import CSharpParser
 from .metrics import MetricsCalculator
 from .rules import RulesEngine
 from .reporter import Reporter
+from .incremental import IncrementalAnalyzer
 
 
 def find_csharp_files(directory: Path) -> list:
@@ -176,6 +177,161 @@ def analyze(
                 ),
                 err=True
             )
+
+
+@cli.command(name='analyze-incremental')
+@click.argument('path', type=click.Path(exists=True))
+@click.option(
+    '--since',
+    default='HEAD~1',
+    help='Git reference to compare from (default: HEAD~1)'
+)
+@click.option(
+    '--until',
+    default='HEAD',
+    help='Git reference to compare to (default: HEAD)'
+)
+@click.option(
+    '--unstaged',
+    is_flag=True,
+    help='Analyze unstaged (modified) files instead of commits'
+)
+@click.option(
+    '--no-cache',
+    is_flag=True,
+    help='Disable cache, analyze all changed files'
+)
+@click.option(
+    '--output',
+    type=click.Path(),
+    help='Output file for report (supports .json, .csv, .html)'
+)
+@click.option(
+    '--format',
+    type=click.Choice(['summary', 'detailed', 'table', 'json', 'csv', 'html']),
+    default='table',
+    help='Output format for console display'
+)
+@click.option(
+    '--max-issues',
+    type=int,
+    default=50,
+    help='Maximum issues to display'
+)
+@click.option(
+    '--rules-dir',
+    type=click.Path(exists=True),
+    help='Directory containing rule definitions'
+)
+def analyze_incremental(
+    path: str,
+    since: str,
+    until: str,
+    unstaged: bool,
+    no_cache: bool,
+    output: Optional[str],
+    format: str,
+    max_issues: int,
+    rules_dir: Optional[str]
+):
+    """
+    Analyze C# code incrementally using git changes and caching
+    
+    Much faster than full analysis by only analyzing changed files.
+    Results are cached to skip re-analyzing unchanged files.
+    
+    Examples:
+        # Analyze changes since last commit
+        csharp-analyzer analyze-incremental ./src
+        
+        # Analyze changes between branches
+        csharp-analyzer analyze-incremental ./src --since main --until develop
+        
+        # Analyze unstaged changes (before commit)
+        csharp-analyzer analyze-incremental ./src --unstaged
+        
+        # Force fresh analysis (ignore cache)
+        csharp-analyzer analyze-incremental ./src --no-cache
+    """
+    
+    target_path = Path(path)
+    
+    if not target_path.is_dir():
+        click.echo(click.style("❌ Path must be a directory", fg='red'))
+        sys.exit(1)
+    
+    try:
+        rules_directory = rules_dir or str(Path(__file__).parent.parent.parent / "rules")
+        
+        with IncrementalAnalyzer(
+            str(target_path),
+            rules_directory=rules_directory if Path(rules_directory).exists() else None
+        ) as incremental:
+            
+            # Run analysis
+            findings = incremental.analyze(
+                since=since,
+                until=until,
+                use_cache=not no_cache,
+                unstaged=unstaged
+            )
+            
+            if not findings:
+                click.echo(click.style("✅ No issues found!", fg='green'))
+                return
+            
+            # Create reporter and add findings
+            reporter = Reporter()
+            reporter.add_findings(findings)
+            
+            # Display results
+            if format == 'summary':
+                reporter.print_summary()
+            elif format == 'detailed':
+                reporter.print_detailed(max_issues)
+            elif format == 'table':
+                reporter.print_summary()
+                reporter.print_table(max_issues)
+            elif format == 'json':
+                click.echo(reporter.to_json())
+            elif format == 'csv':
+                click.echo(reporter.to_csv())
+            elif format == 'html':
+                click.echo(reporter.to_html())
+            
+            # Save report if requested
+            if output:
+                if output.endswith('.json'):
+                    reporter.save_json(output)
+                    click.echo(click.style(f"✓ Report saved: {output}", fg='green'))
+                elif output.endswith('.csv'):
+                    reporter.save_csv(output)
+                    click.echo(click.style(f"✓ Report saved: {output}", fg='green'))
+                elif output.endswith('.html'):
+                    reporter.save_html(output)
+                    click.echo(click.style(f"✓ Report saved: {output}", fg='green'))
+                else:
+                    click.echo(
+                        click.style(
+                            "⚠️  Unknown output format. Supported: .json, .csv, .html",
+                            fg='yellow'
+                        ),
+                        err=True
+                    )
+            
+            # Show cache stats
+            stats = incremental.get_cache_stats()
+            click.echo()
+            click.echo(click.style("Cache Statistics:", fg='cyan'))
+            click.echo(f"  Total cached files: {stats['total_cached_files']}")
+            click.echo(f"  Cache size: {stats['cache_size_kb']} KB")
+            
+    except ValueError as e:
+        click.echo(click.style(f"❌ Error: {e}", fg='red'), err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(click.style(f"❌ Unexpected error: {e}", fg='red'), err=True)
+        sys.exit(1)
 
 
 @cli.command()
